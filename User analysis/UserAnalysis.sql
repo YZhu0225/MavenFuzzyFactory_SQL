@@ -39,4 +39,56 @@ ORDER BY 3 DESC
 GROUP BY 1;
 
 
+/*
+Now you’ve got me curious to better understand the behavior of these repeat customers. Could you help me understand the minimum, maximum, and average time between the 
+first and second session for customers who do come back? Again, analyzing 2014 to date is probably the right time period.
+*/
+
+
+
+
+
+
+
+
+
+
+/*
+Let’s do a bit more digging into our repeat customers. Can you help me understand the channels they come back through? Curious if it’s all direct type-in, or if 
+we’re paying for these customers with paid search ads multiple times. Comparing new vs. repeat sessions by channel would be really valuable, if you’re able to pull it! 
+2014 to date is great.
+*/
+
+
+
+
+
+
+
+
+
+
+/*
+Sounds like you and Tom have learned a lot about our repeat customers. Can I trouble you for one more thing? I’d love to do a comparison of conversion rates and 
+revenue per session for repeat sessions vs new sessions. Let’s continue using data from 2014, year to date.
+*/
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+*/
+
+
+
+
+
 
