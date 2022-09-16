@@ -1,5 +1,6 @@
 /*
-We’re about to launch a new product, and I’d like to do a deep dive on our current flagship product. Can you please pull monthly trends to date for number of sales, total revenue, and total margin generated for the business
+We’re about to launch a new product, and I’d like to do a deep dive on our current flagship product. Can you please pull monthly trends to date for number of sales, 
+total revenue, and total margin generated for the business
 */
 
 SELECT YEAR(created_at) AS yr, 
@@ -13,8 +14,8 @@ GROUP BY 1, 2;
 
 
 /*
-We launched our second product back on January 6th. Can you pull together some trended analysis? I’d like to see monthly order volume, overall conversion rates, revenue per session, and a breakdown of sales by 
-product, all for the time period since April 1, 2012.
+We launched our second product back on January 6th. Can you pull together some trended analysis? I’d like to see monthly order volume, overall conversion rates, 
+revenue per session, and a breakdown of sales by product, all for the time period since April 1, 2012.
 */
 
 SELECT YEAR(ws.created_at) AS yr,        # should be ws.created_at, not o.created_at
@@ -33,7 +34,8 @@ GROUP BY 1, 2
 
 /*
 Now that we have a new product, I’m thinking about our user path and conversion funnel. Let’s look at sessions which hit the /products page and see where they went next. 
-Could you please pull clickthrough rates from /products since the new product launch on January 6th 2013, by product, and compare to the 3 months leading up to launch as a baseline?
+Could you please pull clickthrough rates from /products since the new product launch on January 6th 2013, by product, and compare to the 3 months leading up to launch 
+as a baseline?
 */
 
 -- Step 1: finding the /products pageviews we care about
@@ -86,8 +88,8 @@ GROUP BY time_period
 
 
 /*
-I’d like to look at our two products since January 6th and analyze the conversion funnels from each product page to conversion. It would be great if you could produce a comparison between 
-the two conversion funnels, for all website traffic.
+I’d like to look at our two products since January 6th and analyze the conversion funnels from each product page to conversion. It would be great if you could produce 
+a comparison between the two conversion funnels, for all website traffic.
 */
 
 
@@ -175,8 +177,9 @@ GROUP BY product_seen;
        
 
 /*
-On September 25th we started giving customers the option to add a 2nd product while on the /cart page. Morgan says this has been positive, but I’d like your take on it. Could you please compare the month before vs the month 
-after the change? I’d like to see CTR from the /cart page, Avg Products per Order, AOV, and overall revenue per /cart page view.
+On September 25th we started giving customers the option to add a 2nd product while on the /cart page. Morgan says this has been positive, but I’d like your take on it. 
+Could you please compare the month before vs the month after the change? I’d like to see CTR from the /cart page, Avg Products per Order, AOV, and overall revenue 
+per /cart page view.
 */
 
 USE mavenfuzzyfactory;
@@ -245,8 +248,8 @@ GROUP BY time_period;
 
 
 /*
-On December 12th 2013, we launched a third product targeting the birthday gift market (Birthday Bear). Could you please run a pre-post analysis comparing the month before vs. the month after, in terms of session-toorder conversion rate, AOV, products per order, and 
-revenue per session?
+On December 12th 2013, we launched a third product targeting the birthday gift market (Birthday Bear). Could you please run a pre-post analysis comparing the month 
+before vs. the month after, in terms of session-toorder conversion rate, AOV, products per order, and revenue per session?
 */
 
 USE mavenfuzzyfactory;
@@ -267,9 +270,31 @@ ORDER BY 1;
 
 /*
 Our Mr. Fuzzy supplier had some quality issues which weren’t corrected until September 2013. Then they had a major problem where the bears’ arms were falling off in 
-Aug/Sep 2014. As a result, we replaced them with a new supplier on September 16, 2014. Can you please pull monthly product refund rates, by product, and confirm our quality issues are now fixed?
+Aug/Sep 2014. As a result, we replaced them with a new supplier on September 16, 2014. Can you please pull monthly product refund rates, by product, and confirm our
+quality issues are now fixed?
 */
 
+USE mavenfuzzyfactory;
+
+SELECT YEAR(oi.created_at) AS yr,
+       MONTH(oi.created_at) AS mo,
+       COUNT(DISTINCT CASE WHEN oi.product_id = 1 THEN oi.order_item_id ELSE NULL END) AS p1_orders,
+       COUNT(DISTINCT CASE WHEN oi.product_id = 1 THEN oir.order_item_id ELSE NULL END) 
+			/ COUNT(DISTINCT CASE WHEN oi.product_id = 1 THEN oi.order_item_id ELSE NULL END) AS p1_refund_rt ,
+       COUNT(DISTINCT CASE WHEN oi.product_id = 2 THEN oi.order_item_id ELSE NULL END) AS p2_orders,
+       COUNT(DISTINCT CASE WHEN oi.product_id = 2 THEN oir.order_item_id ELSE NULL END) 
+			/ COUNT(DISTINCT CASE WHEN oi.product_id = 2 THEN oi.order_item_id ELSE NULL END) AS p2_refund_rt ,
+       COUNT(DISTINCT CASE WHEN oi.product_id = 3 THEN oi.order_item_id ELSE NULL END) AS p3_orders,
+       COUNT(DISTINCT CASE WHEN oi.product_id = 3 THEN oir.order_item_id ELSE NULL END) 
+			/ COUNT(DISTINCT CASE WHEN oi.product_id = 3 THEN oi.order_item_id ELSE NULL END) AS p3_refund_rt ,
+       COUNT(DISTINCT CASE WHEN oi.product_id = 4 THEN oi.order_item_id ELSE NULL END) AS p4_orders,
+       COUNT(DISTINCT CASE WHEN oi.product_id = 4 THEN oir.order_item_id ELSE NULL END) 
+			/ COUNT(DISTINCT CASE WHEN oi.product_id = 4 THEN oi.order_item_id ELSE NULL END) AS p4_refund_rt 
+FROM order_item_refunds AS oir
+RIGHT JOIN order_items AS oi
+ON oir.order_item_id = oi.order_item_id
+WHERE oi.created_at < "2014-10-15"
+GROUP BY 1, 2
 
 
 
