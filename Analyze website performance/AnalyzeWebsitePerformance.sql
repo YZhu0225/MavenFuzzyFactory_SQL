@@ -158,7 +158,48 @@ I’d like to understand where we lose our gsearch visitors between the new /lan
 customers make it to each step? Start with /lander-1 and build the funnel all the way to our thank you page. Please use data since August 5th.
 */
 
+CREATE TEMPORARY TABLE lander1_thankyou
+SELECT website_session_id,
+       MAX(products) AS products,
+       MAX(fuzzy) AS fuzzy,
+       MAX(cart) AS cart,
+       MAX(shipping) AS shipping,
+       MAX(billing) AS billing, 
+       MAX(thankyou) AS thankyou
+ 
+ FROM (
+       SELECT wp.website_session_id, wp.pageview_url , 
+              CASE WHEN wp.pageview_url = '/products' THEN 1 ELSE 0 END AS products,
+              CASE WHEN wp.pageview_url = '/the-original-mr-fuzzy' THEN 1 ELSE 0 END AS fuzzy,
+              CASE WHEN wp.pageview_url = '/cart' THEN 1 ELSE 0 END AS cart,
+              CASE WHEN wp.pageview_url = '/shipping' THEN 1 ELSE 0 END AS shipping,
+              CASE WHEN wp.pageview_url = '/billing' THEN 1 ELSE 0 END AS billing,
+              CASE WHEN wp.pageview_url = '/thank-you-for-your-order' THEN 1 ELSE 0 END AS thankyou
+       FROM website_sessions AS ws
+       LEFT OUTER JOIN website_pageviews AS wp
+       ON wp.website_session_id = ws.website_session_id
+       WHERE wp.created_at > '2012-08-05' AND wp.created_at < '2012-09-05'
+              AND ws.utm_source = 'gsearch' AND ws.utm_campaign= 'nonbrand'
 
+       ) AS a 
+GROUP BY 1;
+
+SELECT COUNT(website_session_id) AS sessions,
+       SUM(products) AS to_products,
+       SUM(fuzzy) as to_fuzzy,
+       SUM(cart) as to_cart,
+       SUM(shipping) as to_ship,
+       SUM(billing) as to_billing,
+       sum(thankyou)as to_thankyou
+FROM lander1_thankyou;
+
+SELECT SUM(products)/COUNT(website_session_id) AS lander_click_rt,
+       SUM(fuzzy) / SUM(products) AS product_click,
+       SUM(cart) / SUM(fuzzy) AS fuzzy_click,
+       SUM(shipping) / SUM(cart) AS cart_click,
+       SUM(billing) / SUM(shipping) AS shipping_click,
+       sum(thankyou) / SUM(billing) AS billing_click
+FROM lander1_thankyou;
 
 
 /*
@@ -166,6 +207,19 @@ We tested an updated billing page based on your funnel analysis. Can you take a 
 We’re wondering what % of sessions on those pages end up placing an order. FYI – we ran this test for all traffic, not just for our search visitors.
 */
 
+SELECT  wp.website_session_id, wp.pageview_url, o.website_session_id AS order_session_id
+FROM website_pageviews AS wp
+LEFT JOIN orders AS o 
+ON wp.website_session_id = o.website_session_id
+WHERE wp.pageview_url in ('/billing', '/billing-2')
+      AND wp.created_at between '2012-09-10' and '2012-11-10';
+
+SELECT pageview_url, 
+       COUNT(website_session_id) AS sessions, 
+       COUNT(order_session_id) AS orders,
+       COUNT(order_session_id) / COUNT(website_session_id) AS billing_order_rate
+FROM sessions_orders
+GROUP BY 1;
 
 
 
